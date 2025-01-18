@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { logout } from "@/app/(api)/logout/route";
 import { User } from "@supabase/supabase-js";
+import Link from "next/link";
 
 export function NavUser({ user }: { user?: User | null }) {
   const { isMobile } = useSidebar();
@@ -98,9 +99,11 @@ export function NavUser({ user }: { user?: User | null }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <Link href="/account">
+                  <BadgeCheck />
+                  Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />

@@ -4,16 +4,12 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
 import { z } from "zod";
+import { email, full_name, password } from "@/lib/form-schema";
 
 const signupSchema = z.object({
-  full_name: z
-    .string()
-    .trim()
-    .regex(/^[A-Za-z\s]*$/, "Only alphabets and spaces are allowed")
-    .min(6)
-    .max(255),
-  email: z.string().trim().email(),
-  password: z.string().trim().min(8),
+  full_name: full_name,
+  email: email,
+  password: password,
 });
 
 export async function signup(formData: FormData) {
