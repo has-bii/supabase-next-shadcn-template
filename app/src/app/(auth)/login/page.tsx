@@ -1,30 +1,34 @@
-import filterSearchParams from "@/utils/filter-search-params";
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/app/(auth)/(login & register)/login/actions";
-import { cn } from "@/lib/utils";
+import { login } from "@/app/(auth)/login/actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import React from "react";
+import { Loader, LogIn } from "lucide-react";
 
-type Props = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export default async function LoginPage({ searchParams }: Props) {
-  const error = filterSearchParams<string | undefined>(
-    (await searchParams).error,
-    "string",
-  );
+export default function LoginPage() {
+  const [state, formAction, isPending] = React.useActionState(login, null);
 
   return (
-    <form className="p-6 md:p-8">
+    <form className="p-6 md:p-8" action={formAction}>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col items-center text-center">
           <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground text-balance">
+          <p className="text-balance text-muted-foreground">
             Login to your account
           </p>
         </div>
+        {state?.message && !state.success ? (
+          <div className="flex w-full items-center justify-center rounded-md border border-destructive bg-destructive/10 py-4">
+            <p className="max-w-sm text-center text-sm text-destructive">
+              {state.message}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -32,8 +36,14 @@ export default async function LoginPage({ searchParams }: Props) {
             name="email"
             type="email"
             placeholder="m@example.com"
+            defaultValue={state?.raw_input?.email}
             required
           />
+          {state?.errors?.email && (
+            <span className="text-sm text-destructive">
+              {state.errors.email[0]}
+            </span>
+          )}
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -46,20 +56,18 @@ export default async function LoginPage({ searchParams }: Props) {
             </a>
           </div>
           <Input id="password" name="password" type="password" required />
-          <span
-            className={cn(
-              "text-destructive text-sm",
-              typeof error === "undefined" ? "hidden" : "",
-            )}
-          >
-            {error}
-          </span>
+          {state?.errors?.password && (
+            <span className="text-sm text-destructive">
+              {state.errors.password[0]}
+            </span>
+          )}
         </div>
-        <Button type="submit" formAction={login} className="w-full">
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? <Loader className="animate-spin" /> : <LogIn />}
           Login
         </Button>
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-          <span className="text-muted-foreground relative z-10 bg-background px-2">
+        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+          <span className="relative z-10 bg-background px-2 text-muted-foreground">
             Or continue with
           </span>
         </div>
